@@ -7,6 +7,10 @@ export default class DataObject {
     this.rowArray = new RowArray({ rowList });
   }
 
+  getColumnIndex(columnName) {
+    return this.columnArray.getColumn(columnName).index;
+  }
+
   addColumn(name, type, position) {
     this.columnArray.addColumn(name, type, position);
   }

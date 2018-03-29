@@ -1,25 +1,21 @@
 import CellObject from "./CellObject";
 
 export default class RowObject {
-  constructor({ data }) {
-    this.cellList = [];
-    for (let i = 0, length = data.length; i < length; i += 1){
-      this.cellList.push(new CellObject(data[i]));
-    }
+  constructor({ rowData }) {
+    this.rowData = rowData;
   }
 
   addCell(position, data, cellType) {
-    const cell = new CellObject(data, cellType);
-    this.data.splice(position, 0, cell);
+    this.rowData.splice(position, 0, data);
   }
 
   removeCell(position) {
-    this.data.splice(position, 1);
+    this.rowData.splice(position, 1);
   }
 
   swapCell(cellOnePosition, cellTwoPosition) {
-    const tmpCell = this.data[cellOnePosition];
-    this.data[cellOnePosition] = this.data[cellTwoPosition];
-    this.data[cellTwoPosition] = tmpCell;
+    const tmpCell = this.rowData[cellOnePosition];
+    this.rowData[cellOnePosition] = this.data[cellTwoPosition];
+    this.rowData[cellTwoPosition] = tmpCell;
   }
 }
