@@ -1,12 +1,19 @@
-import CellObject from "./CellObject";
-
 export default class RowObject {
-  constructor({ rowData }) {
-    this.rowData = rowData;
+  constructor({ data = [] }) {
+    this.rowData = data;
   }
 
-  addCell(position, data, cellType) {
+  editCell(columnIndex, value) {
+    this.rowData[columnIndex] = value;
+  }
+
+  addCell(position, data = "") {
     this.rowData.splice(position, 0, data);
+  }
+
+  pushCell(data = "") {
+    const newLastIndex = this.rowData.length;
+    this.rowData[newLastIndex] = data;
   }
 
   removeCell(position) {

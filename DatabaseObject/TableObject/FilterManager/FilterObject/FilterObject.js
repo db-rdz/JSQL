@@ -1,27 +1,75 @@
-export default class FilterObject {
-    constructor({ targetColumn, filterFunction, parameters }) {
-        this.targetColumn = targetColumn;
-        this.filterFunction = filterFunction;
-        this.parameters = parameters;
+import DataObject from "../../DataObject/DataObject";
 
-        this.inputDataObject = null;
-        this.outputDataObject = null;
+export default class FilterObject {
+    constructor({ targetColumn, filterFunction, parameters, status, tag }) {
+        this.tag = tag || null;                     // Gives the FilterObject a tag to access it easier.
+        this.status = status || false;              // Tells if the filter is on or off.
+        this.targetColumn = targetColumn;           // Specifies a column for the filter to look through. if no column is specified all columns will be looked through.
+        this.filterFunction = filterFunction;       // Specified the filter function to use to filter data.
+        this.parameters = parameters;               // This object holds the parameters the filter needs.
+
+        this.inputDataObject = null;                // The original set of data that the filter is applied to.
+        this.outputDataObject = null;               // The output when the filter is turned on.
     }
 
+    // -------------------------------- STATUS FUNCTIONS ------------------------------- //
+    /** ---------------- ON FUNCTION ------------------- /
+     * 
+     * @param {*} inputDataObject this is the data that is going to be filtered. See
+     * the DataObject class for more info on the structure of this object.
+     * 
+     * @returns inputDataObject a new DataObject.
+     * 
+     */
     on(inputDataObject) {
         this.inputDataObject = inputDataObject;
-        const columnIndex = inputDataObject.getColumnIndex(this.targetColumn);
-        const rowArrayObject = inputDataObject.rowArray;
+        let columnIndex = this.targetColumn ? inputDataObject.getColumnIndex(this.targetColumn) : false;
+        const rowSet = inputDataObject.rowArray.rowList;
+
+        const FilteredDataSet = new DataObject({ });
         
-        for(let i = 0, length = rowArrayObject.length; i < length; i += 1) {
-            if (this[this.filterFunction](columnIndex, rowArrayObject[i].rowData, this.parameters)) {
-                // TODO: FINISH ON FUNCTION
+        
+
+        FilteredDataSet.columnArray = inputDataObject.columnArray;
+        
+        for(let rowIndex = 0, length = rowSet.length, rowObject, rowData; rowIndex < length; rowIndex += 1) {
+            rowObject = rowSet[rowIndex];
+            rowData = rowObject.rowData;
+            switch (columnIndex) {
+                case true: { // If columnIndex is specified then just filter on that column.
+                    if (this[this.filterFunction](columnIndex, rowData, this.parameters)) {
+                        FilteredDataSet.pushRow(rowSet[rowIndex].rowData);
+                    }
+                    break;
+                }
+                default: { // If no columnIndex is specified look on all columns.
+                    for (let columnNumber = 0, length = rowData.length; columnIndex < length; columnIndex += 1) {
+                        if (this[this.filterFunction](columnNumber, rowData, this.parameters)) {
+                            FilteredDataSet.pushRow(rowSet[rowIndex].rowData);
+                            break; // If filter already added row to the filtered rows then break off the loop.
+                        }
+                    }
+                }
             }
         }
+        this.status = true;
+        return FilteredDataSet;
     }
 
-    off() {
 
+    /** ---------------- OFF FUNCTION ------------------- /
+     * 
+     * 
+     * @returns the original DataObject passed.
+     * 
+     */
+    off() {
+        const returnValue = this.inputDataObject;
+        this.inputDataObject = null;
+        this.outputDataObject = null;
+        this.status = false;
+
+        return returnValue;
     }
 
      // ------------------------ NUMBER FILTERS ----------------------- //

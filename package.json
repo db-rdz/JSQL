@@ -1,0 +1,27 @@
+{
+  "name": "jsql",
+  "version": "1.0.0",
+  "description": "Manage table-like data in front-end",
+  "main": "./DatabaseObject/DatabaseObject",
+  "scripts": {
+    "test": "mocha --require babel-polyfill --require babel-register"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/db-rdz/JSQL.git"
+  },
+  "author": "Daniel B. Rodriguez",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/db-rdz/JSQL/issues"
+  },
+  "homepage": "https://github.com/db-rdz/JSQL#readme",
+  "devDependencies": {
+    "babel-plugin-root-import": "^5.1.0",
+    "babel-polyfill": "^6.26.0",
+    "babel-preset-env": "^1.6.1",
+    "babel-register": "^6.26.0",
+    "chai": "^4.1.2",
+    "mocha": "^5.0.5"
+  }
+}
