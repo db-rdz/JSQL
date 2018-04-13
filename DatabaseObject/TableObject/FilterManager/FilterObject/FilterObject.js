@@ -36,14 +36,14 @@ export default class FilterObject {
             rowObject = rowSet[rowIndex];
             rowData = rowObject.rowData;
             switch (columnIndex) {
-                case true: { // If columnIndex is specified then just filter on that column.
+                case (!isNaN(columnIndex)): { // If columnIndex is specified then just filter on that column.
                     if (this[this.filterFunction](columnIndex, rowData, this.parameters)) {
-                        FilteredDataSet.pushRow(rowSet[rowIndex].rowData);
+                        FilteredDataSet.pushRow(rowData);
                     }
                     break;
                 }
                 default: { // If no columnIndex is specified look on all columns.
-                    for (let columnNumber = 0, length = rowData.length; columnIndex < length; columnIndex += 1) {
+                    for (let columnNumber = 0, row_length = rowData.length; columnNumber < row_length; columnNumber += 1) {
                         if (this[this.filterFunction](columnNumber, rowData, this.parameters)) {
                             FilteredDataSet.pushRow(rowSet[rowIndex].rowData);
                             break; // If filter already added row to the filtered rows then break off the loop.

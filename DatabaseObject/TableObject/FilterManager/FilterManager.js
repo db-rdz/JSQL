@@ -25,6 +25,7 @@ export default class FilterManager {
             }
 
             const filterListIndex = this.filterList.length;
+            filter.filterListIndex = filterListIndex;
             this.filterList.push(filter);
             return filter;
         }
@@ -33,24 +34,22 @@ export default class FilterManager {
         }
     }
 
-    deleteFilter(filterListIndex) {
-        let filter;
-        if (filterListIndex) {
-            filter = this.filterList[filterListIndex];
-            if (filter) {
+    deleteFilter({ filterListIndex, filterTag }) {
+        const filter = this.filterList[filterListIndex] || this.taggedFilters[filterTag];
 
-                if (filter.status) {
-                    // Take some action if the filter is activated.
-                    this.outputDataObject = filter.off();
-                    const endIndex = this.activatedFilters.length - 1;
-                    this.reApplyFiltersInRange(filters.activatedFilterIndex, endIndex);
-                }
+        if (filter) {
 
-                isActivatedFilterRemoved = filter.activatedFilterIndex ? this.activatedFilter.splice(filter.activatedFilterIndex, 1) : null;
-                isFilterTaggedFilterRemoved = filter.tag ? delete this.taggedFilters[filter.tag] : null;
-                this.filterList.splice(filterListIndex, 1);
+            if (filter.status) {
+                // Take some action if the filter is activated.
+                this.outputDataObject = this.off({ filterListIndex, filterTag });
             }
+
+            if (filter.tag) {
+                delete this.taggedFilters[filter.tag];
+            }
+            this.filterList.splice(filter.filterListIndex, 1);
         }
+        
         return this.outputDataObject;
     }
 
@@ -58,6 +57,10 @@ export default class FilterManager {
         const filter = this.filterList[filterListIndex] || this.taggedFilters[filterTag];
         if (filter) {
             this.outputDataObject = filter.on(this.outputDataObject || this.inputDataObject);
+            if (filter.status) {
+                filter.activatedFilterIndex = this.activatedFilters.length;
+                this.activatedFilters.push(filter);
+            }
         }
         return this.outputDataObject;
     }
@@ -73,7 +76,7 @@ export default class FilterManager {
                 this.reApplyFiltersInRange(activatedFilterIndex, endIndex);
             }
         }
-        this.outputDataObject;
+        return this.outputDataObject;
     }
 
     reApplyAllFilters() {
@@ -84,7 +87,7 @@ export default class FilterManager {
 
     reApplyFiltersInRange(start, end) {
         const filter = this.activatedFilters[start];
-        if (start < end) {
+        if (start <= end) {
             this.outputDataObject = filter.on(this.outputDataObject);
             this.reApplyFiltersInRange(start + 1, end);
         } else {

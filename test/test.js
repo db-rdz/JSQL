@@ -93,19 +93,6 @@ describe('#FilterManager', function() {
         table.createFilter({ targetColumn: "Name", filterFunction: "equalTo", parameters: "Da" });
     });
 
-    it('It should activate a filter', function() {
-        var result = new DatabaseObject({ name: "TestDatabase" });
-        let table = result.addTable("Clients");
-        table.pushColumn("Name", "String");
-        table.pushColumn("Last Name", "String");
-        table.pushRow();
-        table.pushRow();
-        table.editCell(0, "Name", "Da");
-
-        table.createFilter({ targetColumn: "Name", filterFunction: "equalTo", parameters: "Da", tag: "test1" });
-        table.activateFilter({ filterTag: "test1" });
-    });
-
 
     it('It should activate a filter', function() {
         var result = new DatabaseObject({ name: "TestDatabase" });
@@ -120,6 +107,136 @@ describe('#FilterManager', function() {
         table.createFilter({ targetColumn: "Name", filterFunction: "equalTo", parameters: "Da", tag: "test1" });
         const output = table.activateFilter({ filterTag: "test1" });
         expect(output.rowArray.rowList).to.have.lengthOf(2);
+    });
+
+    it('It activates two filter objects', function() {
+        var result = new DatabaseObject({ name: "TestDatabase" });
+        let table = result.addTable("Clients");
+        table.pushColumn("Name", "String");
+        table.pushColumn("Last Name", "String");
+        table.pushRow(["Daniel", "Rodriguez"]);
+        table.pushRow(["Raul", "Rodriguez"]);
+        table.pushRow(["Raul", "Ortega"]);
+        table.pushRow(["Daniel", "Ortega"]);
+        table.pushRow(["Benjamin", "Ortega"]);
+        table.pushRow(["Benjamin", "Rodriguez"]);
+        table.pushRow();
+
+        table.createFilter({ targetColumn: "Name", filterFunction: "equalTo", parameters: "Daniel", tag: "test1" });
+        table.createFilter({ targetColumn: "Last Name", filterFunction: "equalTo", parameters: "Rodriguez", tag: "test2" });
+        
+        const output = table.activateFilter({ filterTag: "test2" });
+        expect(output.rowArray.rowList).to.have.lengthOf(3);
+        const output2 = table.activateFilter({ filterTag: "test1" });
+        expect(output2.rowArray.rowList).to.have.lengthOf(1);
+    });
+
+    it('It activates two filter objects and deactivates one.', function() {
+        var result = new DatabaseObject({ name: "TestDatabase" });
+        let table = result.addTable("Clients");
+        table.pushColumn("Name", "String");
+        table.pushColumn("Last Name", "String");
+        table.pushRow(["Daniel", "Rodriguez"]);
+        table.pushRow(["Raul", "Rodriguez"]);
+        table.pushRow(["Raul", "Ortega"]);
+        table.pushRow(["Daniel", "Ortega"]);
+        table.pushRow(["Benjamin", "Ortega"]);
+        table.pushRow(["Benjamin", "Rodriguez"]);
+        table.pushRow();
+
+        table.createFilter({ targetColumn: "Name", filterFunction: "equalTo", parameters: "Daniel", tag: "test1" });
+        table.createFilter({ targetColumn: "Last Name", filterFunction: "equalTo", parameters: "Rodriguez", tag: "test2" });
+        
+        const output = table.activateFilter({ filterTag: "test2" });
+        expect(output.rowArray.rowList).to.have.lengthOf(3);
+        const output2 = table.activateFilter({ filterTag: "test1" });
+        expect(output2.rowArray.rowList).to.have.lengthOf(1);
+
+        const output3 = table.deactivateFilter({ filterTag: "test2" });
+        expect(output3.rowArray.rowList).to.have.lengthOf(2);
+    });
+
+    it('It activates two filter objects and deletes one.', function() {
+        var result = new DatabaseObject({ name: "TestDatabase" });
+        let table = result.addTable("Clients");
+        table.pushColumn("Name", "String");
+        table.pushColumn("Last Name", "String");
+        table.pushRow(["Daniel", "Rodriguez"]);
+        table.pushRow(["Raul", "Rodriguez"]);
+        table.pushRow(["Raul", "Ortega"]);
+        table.pushRow(["Daniel", "Ortega"]);
+        table.pushRow(["Benjamin", "Ortega"]);
+        table.pushRow(["Benjamin", "Rodriguez"]);
+        table.pushRow();
+
+        table.createFilter({ targetColumn: "Name", filterFunction: "equalTo", parameters: "Daniel", tag: "test1" });
+        table.createFilter({ targetColumn: "Last Name", filterFunction: "equalTo", parameters: "Rodriguez", tag: "test2" });
+        
+        const output = table.activateFilter({ filterTag: "test2" });
+        expect(output.rowArray.rowList).to.have.lengthOf(3);
+        const output2 = table.activateFilter({ filterTag: "test1" });
+        expect(output2.rowArray.rowList).to.have.lengthOf(1);
+
+        const output3 = table.deleteFilter({ filterTag: "test2" });
+        expect(output3.rowArray.rowList).to.have.lengthOf(2);
+    });
+
+    it('It activates two filter objects, deletes one and recreates and activates the deleted one.', function() {
+        var result = new DatabaseObject({ name: "TestDatabase" });
+        let table = result.addTable("Clients");
+        table.pushColumn("Name", "String");
+        table.pushColumn("Last Name", "String");
+        table.pushRow(["Daniel", "Rodriguez"]);
+        table.pushRow(["Raul", "Rodriguez"]);
+        table.pushRow(["Raul", "Ortega"]);
+        table.pushRow(["Daniel", "Ortega"]);
+        table.pushRow(["Benjamin", "Ortega"]);
+        table.pushRow(["Benjamin", "Rodriguez"]);
+        table.pushRow();
+
+        table.createFilter({ targetColumn: "Name", filterFunction: "equalTo", parameters: "Daniel", tag: "test1" });
+        table.createFilter({ targetColumn: "Last Name", filterFunction: "equalTo", parameters: "Rodriguez", tag: "test2" });
+        
+        const output = table.activateFilter({ filterTag: "test2" });
+        expect(output.rowArray.rowList).to.have.lengthOf(3);
+        const output2 = table.activateFilter({ filterTag: "test1" });
+        expect(output2.rowArray.rowList).to.have.lengthOf(1);
+
+        const output3 = table.deleteFilter({ filterTag: "test2" });
+        expect(output3.rowArray.rowList).to.have.lengthOf(2);
+
+        table.createFilter({ targetColumn: "Last Name", filterFunction: "equalTo", parameters: "Rodriguez", tag: "test2" });
+        const output4 = table.activateFilter({ filterTag: "test2" });
+
+        expect(output4.rowArray.rowList).to.have.lengthOf(1);
+    });
+
+    it('It activates two filter objects and deactivates one and then reactivates the previously desactivated filter.', function() {
+        var result = new DatabaseObject({ name: "TestDatabase" });
+        let table = result.addTable("Clients");
+        table.pushColumn("Name", "String");
+        table.pushColumn("Last Name", "String");
+        table.pushRow(["Daniel", "Rodriguez"]);
+        table.pushRow(["Raul", "Rodriguez"]);
+        table.pushRow(["Raul", "Ortega"]);
+        table.pushRow(["Daniel", "Ortega"]);
+        table.pushRow(["Benjamin", "Ortega"]);
+        table.pushRow(["Benjamin", "Rodriguez"]);
+        table.pushRow();
+
+        table.createFilter({ targetColumn: "Name", filterFunction: "equalTo", parameters: "Daniel", tag: "test1" });
+        table.createFilter({ targetColumn: "Last Name", filterFunction: "equalTo", parameters: "Rodriguez", tag: "test2" });
+        
+        const output = table.activateFilter({ filterTag: "test2" });
+        expect(output.rowArray.rowList).to.have.lengthOf(3);
+        const output2 = table.activateFilter({ filterTag: "test1" });
+        expect(output2.rowArray.rowList).to.have.lengthOf(1);
+
+        const output3 = table.deactivateFilter({ filterTag: "test2" });
+        expect(output3.rowArray.rowList).to.have.lengthOf(2);
+
+        const output4 = table.activateFilter({ filterTag: "test2" });
+        expect(output4.rowArray.rowList).to.have.lengthOf(1);
     });
 
 });
