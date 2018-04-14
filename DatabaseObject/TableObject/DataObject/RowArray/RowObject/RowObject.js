@@ -3,6 +3,11 @@ export default class RowObject {
     this.rowData = data;
   }
 
+  // ---------------------------- GETTERS -------------------------- //
+  getColumnValue(columnIndex) {
+    return this.rowData[columnIndex];
+  }
+
   editCell(columnIndex, value) {
     this.rowData[columnIndex] = value;
   }

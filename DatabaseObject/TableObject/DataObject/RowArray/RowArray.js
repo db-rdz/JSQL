@@ -13,6 +13,18 @@ export default class RowArray {
     return this.rowList.length;
   }
 
+  getColumnValues(columnIndex) {
+    const columnValues = [];
+    let row;
+    for (let i = 0, length = this.rowList.length; i < length; i += 1) {
+      row = this.rowList[i];
+      columnValues.push(row.getColumnValue(columnIndex));
+    }
+    return columnValues;
+  }
+
+  // ---------------------- MODIFIERS ---------------------- //
+
   editCell(rowIndex, columnIndex, value) {
     this.rowList[rowIndex].editCell(columnIndex, value);
   }

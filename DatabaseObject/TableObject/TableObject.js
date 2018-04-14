@@ -2,15 +2,18 @@ import DataObject from './DataObject/DataObject';
 import FilterManager from './FilterManager/FilterManager';
 
 export default class TableObject {
-  constructor({ name = "", dataObject = {} }) {
+  constructor({ name = "", dataObject = {}, filterManager = {}, graphManager = {} }) {
 
     if (!name) {
       throw new console.error("Table must have a name");
     }
 
+    let { filterList, taggedFilters, activatedFilters } = filterManager;
+
     this.name = name;
     this.dataObject = new DataObject(dataObject);
-    this.filterManager = new FilterManager({ inputDataObject: this.dataObject });
+    this.filterManager = new FilterManager({ inputDataObject: this.dataObject, filterList, taggedFilters, activatedFilters });
+
   }
 
   // ------------------------------- GETTERS ------------------------ //
@@ -80,7 +83,7 @@ export default class TableObject {
 
   addColumn(name, type, position) {
     this.dataObject.addColumn(name, type, position);
-    this.addCellInAllRows("EMPTY");
+    this.addCellInAllRows(position, "EMPTY");
   }
 
   pushRow(data = []) {

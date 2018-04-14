@@ -12,7 +12,6 @@ export default class DataObject {
   getColumnIndex(columnName) {
     return this.columnArray.getColumn(columnName).getColumnIndex();
   }
-  
 
   getNumberofColumns() {
     return this.columnArray.getNumberofColumns();
@@ -20,6 +19,11 @@ export default class DataObject {
 
   getNumberofRows() {
     return this.rowArray.getNumberofRows();
+  }
+
+  getColumnValuesByName(columnName) {
+    const columnIndex = this.getColumnIndex(columnName);
+    return this.rowArray.getColumnValues(columnIndex);
   }
 
   // -------------------------- MODIFIERS -------------------------- //

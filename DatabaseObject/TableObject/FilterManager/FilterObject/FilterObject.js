@@ -25,10 +25,7 @@ export default class FilterObject {
         this.inputDataObject = inputDataObject;
         let columnIndex = this.targetColumn ? inputDataObject.getColumnIndex(this.targetColumn) : false;
         const rowSet = inputDataObject.rowArray.rowList;
-
         const FilteredDataSet = new DataObject({ });
-        
-        
 
         FilteredDataSet.columnArray = inputDataObject.columnArray;
         

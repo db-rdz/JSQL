@@ -1,13 +1,30 @@
 import FilterObject from './FilterObject/FilterObject';
 
 export default class FilterManager {
-    constructor({ inputDataObject, filterList = [], taggedFilters = {}, activatedFilters = [] }) {
-        this.activatedFilters = activatedFilters;
-        this.taggedFilters = taggedFilters;
-        this.filterList = filterList;
+    constructor({ inputDataObject, filterList = [], taggedFilters = [], activatedFilters = [] }) {
+        this.activatedFilters = this.importFilters(activatedFilters);
+        this.taggedFilters = this.importTaggedFilters(taggedFilters);
+        this.filterList = this.importFilters(filterList);
 
         this.inputDataObject = inputDataObject;
-        this.outputDataObject = null;
+        this.outputDataObject = inputDataObject;
+    }
+
+    importFilters(filterArray) {
+        let filters =  [];
+        for(let i = 0, length = filterArray.length; i < length; i += 1) {
+            filters.push(new FilterObject(filterArray[i]));
+        }
+        return filters;
+    }
+
+    importTaggedFilters(taggedFilters) {
+        let keys = Object.keys(taggedFilters);
+        let taggedFilterMap = {};
+        for (let i = 0, length = keys.lenqth; i < length; i += 1) {
+            taggedFilterMap[keys[i]] = new FilterObject(taggedFilters[keys[i]]);
+        }
+        return taggedFilterMap;
     }
 
     createFilter(filterOptions) { // targetColumn, filterFunction, parameters, status, tag
@@ -82,12 +99,17 @@ export default class FilterManager {
     reApplyAllFilters() {
         const start = 0;
         const end = this.activatedFilters.length - 1;
+        this.outputDataObject = this.inputDataObject;
         return this.reApplyFiltersInRange(start, end);
     }
 
+    // Private use only! IT will not set the outputDataObject to anything
+    // and because of that it can only be used by functions that do reset the 
+    // outputDataObject to something... So far there is only 3 functions that do
+    // the reApplyAllFilters and the deleteFilter or off functions
     reApplyFiltersInRange(start, end) {
         const filter = this.activatedFilters[start];
-        if (start <= end) {
+        if (start <= end && filter) {
             this.outputDataObject = filter.on(this.outputDataObject);
             this.reApplyFiltersInRange(start + 1, end);
         } else {
