@@ -1,12 +1,12 @@
 import DataAction from './DataAction/DataAction'
 export default class YAxis {
     // actionType, targetColumnList, groupedData
-    constructor(groupedData, dataAction, label, color) {
+    constructor({ dataObject, groupedData, dataAction, label, color }) {
         this.groupedData = groupedData;
         this.label = label;
         this.color = color;
-        let { actionType, targetColumnList } = DataAction;
-        this.dataAction = new DataAction({ groupedData: this.groupedData, actionType, targetColumnList })
+        let { actionType, targetColumnList } = dataAction;
+        this.dataAction = new DataAction({ dataObject, groupedData: this.groupedData, actionType, targetColumnList })
     }
 
     getDataSet() {

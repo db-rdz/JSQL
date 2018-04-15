@@ -1,5 +1,6 @@
 import DataObject from './DataObject/DataObject';
 import FilterManager from './FilterManager/FilterManager';
+import GraphManager from './GraphManager/GraphManager';
 
 export default class TableObject {
   constructor({ name = "", dataObject = {}, filterManager = {}, graphManager = {} }) {
@@ -13,7 +14,7 @@ export default class TableObject {
     this.name = name;
     this.dataObject = new DataObject(dataObject);
     this.filterManager = new FilterManager({ inputDataObject: this.dataObject, filterList, taggedFilters, activatedFilters });
-
+    this.graphManager = new GraphManager({ dataObject: this.dataObject,  graphManager });
   }
 
   // ------------------------------- GETTERS ------------------------ //

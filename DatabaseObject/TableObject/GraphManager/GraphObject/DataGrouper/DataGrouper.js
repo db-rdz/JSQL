@@ -16,11 +16,11 @@ export default class DataGrouper {
         const datasets = [];
 
         for (let i = 0 , length = this.yAxisList.length; i < length; i += 1) {
-            datasets.push(yAxisList[i].getDataSet());
+            datasets.push(this.yAxisList[i].getDataSet());
         }
 
         return {
-            labels: this.xAxis,
+            labels: this.xAxis.getAxisData(),
             datasets
         }
     }
@@ -29,34 +29,35 @@ export default class DataGrouper {
         const result = [];
         for (let i = 0 , length = yAxisList.length; i <length; i += 1) {
             let { dataAction, label, color } = yAxisList[i];
-            result.push( new YAxis({ groupedData: this.groupedData, dataAction, label, color }))
+            result.push( new YAxis({ dataObject: this.dataObject, groupedData: this.groupedData, dataAction, label, color }));
         }
         return result;
     }
+
+
 
     groupData(targetColumn, groupingType = "Value") {
         switch (groupingType) {
             case "Value": {
                 const groupedByValue = this.groupByValue(targetColumn);
-                groupedByValue.dataObect = this.dataObject;
                 return groupedByValue;
             }
         }
     }
 
     groupByValue(targetColumn) {
-        groupedData = {};
+        const groupedData = {};
         const targetColumnIndex = this.dataObject.getColumnIndex(targetColumn);
-        const rowArray = this.dataObject.rowArray;
+        const rowArray = this.dataObject.rowArray.rowList;
         let rowData;
         let dataKey;
-        for (let i = 0, length = rowArray.length, rowObject = rowArray[i]; i < length; i += 1) {
+        for (let i = 0, length = rowArray.length, rowObject; rowObject = rowArray[i], i < length; i += 1) {
             rowData = rowObject.rowData;
-            datakey = rowData[targetColumnIndex];
-            if (this.groupedData[dataKey]) {
-                this.groupedData[dataKey].push(rowData);
+            dataKey = rowData[targetColumnIndex];
+            if (groupedData[dataKey]) {
+                groupedData[dataKey].push(rowData);
             } else {
-                this.groupedData[dataKey] = [rowData];
+                groupedData[dataKey] = [rowData];
             }
         }
         return groupedData;

@@ -238,5 +238,68 @@ describe('#FilterManager', function() {
         const output4 = table.activateFilter({ filterTag: "test2" });
         expect(output4.rowArray.rowList).to.have.lengthOf(1);
     });
+});
 
+describe('#FilterManager', function() {
+
+    const graph = {
+        options: {
+            legend: true,
+            title: {
+                display: true,
+                text: "hola",
+            },
+        },
+        graphType: 'line',
+        dataGrouper: {
+            groupingType: 'Value',
+            targetColumn: 'Name',
+            yAxisList: [
+                {
+                    dataAction: {
+                        actionType: 'addColumn',
+                        targetColumnList: ['Weight Lost'],
+                        color: ''
+                    },
+                    label: 'Weight loss per person.',
+                    color: "#3e95cd"
+                }
+            ]
+        }
+    };
+
+    it('It should create a graph', function() {
+        var result = new DatabaseObject({ name: "TestDatabase" });
+        let table = result.addTable("Clients");
+
+        table.pushColumn("Name", "String");
+        table.pushColumn("Last Name", "String");
+        table.pushColumn("Weight Lost", "String");
+
+        table.pushRow(["Daniel", "Rodriguez", "40"]);
+        table.pushRow(["Raul", "Rodriguez", "10"]);
+        table.pushRow(["Raul", "Ortega", "60"]);
+        table.pushRow(["Daniel", "Ortega", "20"]);
+        table.pushRow(["Benjamin", "Ortega", "80"]);
+        table.pushRow(["Benjamin", "Rodriguez", "5"]);
+
+        table.createFilter({ targetColumn: "Name", filterFunction: "equalTo", parameters: "Daniel", tag: "test1" });
+        table.createFilter({ targetColumn: "Last Name", filterFunction: "equalTo", parameters: "Rodriguez", tag: "test2" });
+        
+        const output = table.activateFilter({ filterTag: "test2" });
+        expect(output.rowArray.rowList).to.have.lengthOf(3);
+        const output2 = table.activateFilter({ filterTag: "test1" });
+        expect(output2.rowArray.rowList).to.have.lengthOf(1);
+
+        const output3 = table.deactivateFilter({ filterTag: "test2" });
+        expect(output3.rowArray.rowList).to.have.lengthOf(2);
+
+        const output4 = table.activateFilter({ filterTag: "test2" });
+        expect(output4.rowArray.rowList).to.have.lengthOf(1);
+
+        const graphIndex = table.graphManager.createGraph(graph);
+        const graphJSON = table.graphManager.getGraph(graphIndex);
+        console.log(JSON.stringify(graphJSON));
+    });
+        
 });

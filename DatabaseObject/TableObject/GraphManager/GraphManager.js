@@ -15,4 +15,15 @@ export default class GraphManager {
         }
         return results;
     }
+
+    createGraph(graphArgs) {
+        let {options, filterManager, graphType, dataGrouper} =  graphArgs;
+        const createdGraph = new GraphObject({ dataObject: this.dataObject, options, filterManager, graphType, dataGrouper })
+        this.graphList.push(createdGraph);
+        return this.graphList.length - 1; // Returns graph's index
+    }
+
+    getGraph(graphIndex) {
+        return this.graphList[graphIndex].getChart();
+    }
 }

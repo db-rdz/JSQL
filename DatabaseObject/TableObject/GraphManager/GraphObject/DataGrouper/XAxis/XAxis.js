@@ -4,8 +4,7 @@ export default class XAxis {
     }
 
     getAxisData() {
-        const columnValues = this.data.getColumnValuesByName(this.targetColumn);
-
+        return this.xAxisData;
     }
 
     getUniqueValues() {
