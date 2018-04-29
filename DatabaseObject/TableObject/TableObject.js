@@ -144,12 +144,12 @@ export default class TableObject {
   // --------------------------------------- TABLE SEARCHER ACTIONS -------------------------------- //
   searchTable(searchString) {
     const output =  this.tableSearcher.doTableSearch(searchString);
-    this.tablePaginator.setInputDataObject(output);
+    this.processedDataObject = this.tablePaginator.setInputDataObject(output);
   }
 
   searchColumn() {
     const output =  this.tableSearcher.doColumnSearch(searchString);
-    this.tablePaginator.setInputDataObject(output);
+    this.processedDataObject = this.tablePaginator.setInputDataObject(output);
   }
 
   // --------------------------------------- FILTER MANAGER ACTIONS -------------------------------- //
@@ -159,20 +159,26 @@ export default class TableObject {
   }
 
   deleteFilter(filterListIndex) {
-    const output = this.filterManager.deleteFilter(filterListIndex);
-    this.tableSearcher.setInputDataObject(output);
+    let output = this.filterManager.deleteFilter(filterListIndex);
+    output = this.tableSearcher.setInputDataObject(output);
+    output = this.tablePaginator.setInputDataObject(output);
+    this.processedDataObject = output;
     return output;
   }
 
   activateFilter({ filterListIndex, filterTag }) {
-    const output = this.filterManager.on({ filterListIndex, filterTag });
-    this.tableSearcher.setInputDataObject(output);
+    let output = this.filterManager.on({ filterListIndex, filterTag });
+    output = this.tableSearcher.setInputDataObject(output);
+    output = this.tablePaginator.setInputDataObject(output);
+    this.processedDataObject = output;
     return output;
   }
 
   deactivateFilter({ filterListIndex, filterTag }) {
-    const output = this.filterManager.off({ filterListIndex, filterTag });
-    this.tableSearcher.setInputDataObject(output);
+    let output = this.filterManager.off({ filterListIndex, filterTag });
+    output = this.tableSearcher.setInputDataObject(output);
+    output = this.tablePaginator.setInputDataObject(output);
+    this.processedDataObject = output;
     return output;
   }
 

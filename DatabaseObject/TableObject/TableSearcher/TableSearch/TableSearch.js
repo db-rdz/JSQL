@@ -8,7 +8,7 @@ export default class TableSearch {
   }
 
   search(searchString) {
-    this.searchString = this.searchString;
+    this.searchString = searchString;
     const FilteredDataSet = new DataObject({ });
     FilteredDataSet.columnArray = this.inputDataObject.columnArray;
 
