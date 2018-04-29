@@ -1,4 +1,4 @@
-import ValidatableObject from '~/BaseClasses/ValidatableObject';
+import ValidatableObject from '../../../../../BaseClasses/ValidatableObject';
 
 export default class ColumnObject extends ValidatableObject {
   constructor({ name = "", type = "String", index = null }) {

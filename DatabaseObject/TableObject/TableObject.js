@@ -1,5 +1,7 @@
 import DataObject from './DataObject/DataObject';
 import FilterManager from './FilterManager/FilterManager';
+import TableSearcher from './TableSearcher/TableSearcher';
+import TablePaginator from './TablePaginator/TablePaginator';
 import GraphManager from './GraphManager/GraphManager';
 
 export default class TableObject {
@@ -14,7 +16,12 @@ export default class TableObject {
     this.name = name;
     this.dataObject = new DataObject(dataObject);
     this.filterManager = new FilterManager({ inputDataObject: this.dataObject, filterList, taggedFilters, activatedFilters });
+    this.tableSearcher = new TableSearcher({ inputDataObject: this.filterManager.outputDataObject });
+    this.tablePaginator = new TablePaginator({ inputDataObject: this.tableSearcher.outputDataObject, pageSize: 10, navigationBarSize: 10 }); 
+    
     this.graphManager = new GraphManager({ dataObject: this.dataObject,  graphManager });
+
+    this.processedDataObject = this.tablePaginator.getCurrentPageData();
   }
 
   // ------------------------------- GETTERS ------------------------ //
@@ -77,28 +84,30 @@ export default class TableObject {
     this.dataObject.editCell(rowIndex, columnName, value);
   }
 
+  // --------------------------------------- ADDING FUNCITONS ---------------------------------------- //
+
   pushColumn(name, type) {
     this.dataObject.pushColumn(name, type);
     this.pushCellInAllRows("EMPTY");
+    this.processInputDataObject();
   }
 
   addColumn(name, type, position) {
     this.dataObject.addColumn(name, type, position);
     this.addCellInAllRows(position, "EMPTY");
+    this.processInputDataObject();
   }
 
   pushRow(data = []) {
     const sanitizedData = this.sanitizeRowData(data);
     this.dataObject.pushRow(sanitizedData);
+    this.processInputDataObject();
   }
 
   addRow(data, position) {
     const sanitizedData = this.sanitizeRowData(data);
     this.dataObject.addRow(sanitizedData, position);
-  }
-
-  removeRow(position) {
-    this.dataObject.removeRow(position);
+    this.processInputDataObject();
   }
 
   addCell(rowPosition, cellPosition, cellValue) {
@@ -123,19 +132,56 @@ export default class TableObject {
     }
   }
 
+  // --------------------------------------- REMOVING FUNCTIONS ------------------------------------------------- //
+
+  removeRow(position) {
+    this.dataObject.removeRow(position);
+    this.processInputDataObject();
+  }
+
+
+
+  // --------------------------------------- TABLE SEARCHER ACTIONS -------------------------------- //
+  searchTable(searchString) {
+    const output =  this.tableSearcher.doTableSearch(searchString);
+    this.tablePaginator.setInputDataObject(output);
+  }
+
+  searchColumn() {
+    const output =  this.tableSearcher.doColumnSearch(searchString);
+    this.tablePaginator.setInputDataObject(output);
+  }
+
+  // --------------------------------------- FILTER MANAGER ACTIONS -------------------------------- //
+
   createFilter(filterOptions) {
     this.filterManager.createFilter(filterOptions);
   }
 
   deleteFilter(filterListIndex) {
-    return this.filterManager.deleteFilter(filterListIndex);
+    const output = this.filterManager.deleteFilter(filterListIndex);
+    this.tableSearcher.setInputDataObject(output);
+    return output;
   }
 
   activateFilter({ filterListIndex, filterTag }) {
-    return this.filterManager.on({ filterListIndex, filterTag });
+    const output = this.filterManager.on({ filterListIndex, filterTag });
+    this.tableSearcher.setInputDataObject(output);
+    return output;
   }
 
   deactivateFilter({ filterListIndex, filterTag }) {
-    return this.filterManager.off({ filterListIndex, filterTag });
+    const output = this.filterManager.off({ filterListIndex, filterTag });
+    this.tableSearcher.setInputDataObject(output);
+    return output;
+  }
+
+  // ----------------------------------------- SETTERS ----------------------------------------- //
+  processInputDataObject(inputDataObject) {
+    let output = this.filterManager.setInputDataObject(this.dataObject);
+    output = this.tableSearcher.setInputDataObject(output);
+    output = this.tablePaginator.setInputDataObject(output);
+
+    this.processedDataObject = output;
   }
 }

@@ -117,4 +117,9 @@ export default class FilterManager {
         }
 
     }
+
+    setInputDataObject(inputDataObject) {
+        this.inputDataObject = inputDataObject;
+        return this.reApplyAllFilters();
+    }
 }

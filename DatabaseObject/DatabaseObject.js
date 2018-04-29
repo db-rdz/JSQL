@@ -1,10 +1,11 @@
 import TableObject from './TableObject/TableObject';
-import DatabaseComponent from '~/BaseClasses/DataBaseComponent';
+import DatabaseComponent from '../BaseClasses/DataBaseComponent';
+import DataObject from './TableObject/DataObject/DataObject';
 
 export default class DatabaseObject extends DatabaseComponent {
   constructor({ name = "", tableList = [] }) {
     if (!name) {
-      throw new console.error("Database must have a name.");
+      // throw new console.error("Database must have a name.");
     }
 
     super();
@@ -17,8 +18,9 @@ export default class DatabaseObject extends DatabaseComponent {
     }
   }
 
-  addTable(name) {
-    this.tableMap[name] = new TableObject({ name });
+  addTable(name, args = {}) {
+    let { dataObject, filterManager, graphManager } = args;
+    this.tableMap[name] = new TableObject({ name, dataObject, filterManager, graphManager });
     return this.tableMap[name];
   }
 

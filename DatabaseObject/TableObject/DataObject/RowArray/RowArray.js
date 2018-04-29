@@ -3,8 +3,11 @@ import RowObject from './RowObject/RowObject';
 export default class RowArray {
   constructor({ rowList = [] }) {
     this.rowList = [];
+    this.numberofRows = 0;
+    this.number
     for (let i = 0, length = rowList.length; i < length; i += 1) {
       this.rowList.push(new RowObject({ data: rowList[i] }));
+      numberofRows += 1
     }
   }
 
@@ -31,10 +34,12 @@ export default class RowArray {
 
   pushRow(data) {
     this.rowList.push(new RowObject({ data }));
+    this.numberofRows = this.getNumberofRows();
   }
 
   addRow(data, position) {
     this.rowList.splice(position, 0, new RowObject(data));
+    this.numberofRows = this.getNumberofRows();
   }
 
   addCell(rowPosition, cellPosition, cellValue) {

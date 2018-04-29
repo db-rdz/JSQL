@@ -67,7 +67,7 @@ describe('#JSQL QL', function() {
         table.pushRow();
         table.editCell(0, "Name", "Da");
 
-        expect(table.dataObject.rowArray.rowList[0].rowData).to.have.lengthOf(2);
+        expect(table.tablePaginator.outputDataObject.rowArray.rowList[0].rowData).to.have.lengthOf(2);
     });
 
     it('It should make shure that the filter dataobject is the same as the table dataobject', function() {
