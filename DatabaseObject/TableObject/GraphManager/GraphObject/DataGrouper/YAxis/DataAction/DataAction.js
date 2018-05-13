@@ -1,8 +1,8 @@
 export default class DataAction {
-    constructor({ dataObject, actionType, targetColumnList, groupedData }) {
+    constructor({ dataObject= {}, actionType = '', targetColumn = '', groupedData = {} }) {
         this.dataObject = dataObject;
         this.actionType = actionType;
-        this.targetColumnList = targetColumnList;
+        this.targetColumn = targetColumn;
         this.groupedData = groupedData;
         
         this.processedData = this.executeAction();
@@ -15,7 +15,10 @@ export default class DataAction {
     executeAction() {
         switch(this.actionType) {
             case "addColumn": {
-                return this.addColumn(this.targetColumnList[0]);
+                return this.addColumn(this.targetColumn);
+            }
+            case 'countColumn': {
+                return this.countColumn(this.targetColumn);
             }
         }
     }
@@ -38,6 +41,21 @@ export default class DataAction {
                 sum += parsedValue;
             }
             processedData.push(sum);
+        }
+        return processedData;
+    }
+
+    countColumn(targetColumn) {
+        const columnIndex = this.dataObject.getColumnIndex(targetColumn);
+        const keys = Object.keys(this.groupedData);
+        const processedData = [];
+        for(let i = 0, key, rows, sum, count, length = keys.length; i < length; i += 1) {
+            sum = 0;
+            key = keys[i];
+            rows = this.groupedData[key];
+            count = rows.length;
+
+            processedData.push(count);
         }
         return processedData;
     }

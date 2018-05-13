@@ -2,38 +2,23 @@ import XAxis from './XAxis/XAxis';
 import YAxis from './YAxis/YAxis';
 
 export default class DataGrouper {
-    constructor({ dataObject, groupingType, targetColumn, yAxisList }) {
+    constructor({ dataObject = {}, groupingType = '', targetColumn = '', yAxis = {} }) {
         this.dataObject = dataObject;
         this.groupingType = groupingType;
         this.targetColumn = targetColumn;
 
         this.groupedData = this.groupData(targetColumn, groupingType);
         this.xAxis = new XAxis({ xAxisData: Object.keys(this.groupedData) });
-        this.yAxisList = this.createYAxisList(yAxisList);
+        const { dataAction, label, color } = yAxis;
+        this.yAxis = new YAxis({ dataObject: this.dataObject, groupedData: this.groupedData, dataAction, label, color });
     }
 
     getData() {
-        const datasets = [];
-
-        for (let i = 0 , length = this.yAxisList.length; i < length; i += 1) {
-            datasets.push(this.yAxisList[i].getDataSet());
-        }
-
         return {
             labels: this.xAxis.getAxisData(),
-            datasets
+            datasets: [this.yAxis.getDataSet()],
         }
     }
-
-    createYAxisList(yAxisList) {
-        const result = [];
-        for (let i = 0 , length = yAxisList.length; i <length; i += 1) {
-            let { dataAction, label, color } = yAxisList[i];
-            result.push( new YAxis({ dataObject: this.dataObject, groupedData: this.groupedData, dataAction, label, color }));
-        }
-        return result;
-    }
-
 
 
     groupData(targetColumn, groupingType = "Value") {

@@ -1,5 +1,5 @@
 export default class XAxis {
-    constructor({ xAxisData }) {
+    constructor({ xAxisData = {} }) {
         this.xAxisData = xAxisData;
     }
 

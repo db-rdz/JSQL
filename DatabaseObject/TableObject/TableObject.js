@@ -147,8 +147,13 @@ export default class TableObject {
     this.processedDataObject = this.tablePaginator.setInputDataObject(output);
   }
 
-  searchColumn() {
-    const output =  this.tableSearcher.doColumnSearch(searchString);
+  /**
+   * 
+   * @param {*} targetColumn: The name of the column to search in.
+   * @param {*} searchString 
+   */
+  searchColumn(targetColumn, searchString) {
+    const output =  this.tableSearcher.doColumnSearch(targetColumn, searchString);
     this.processedDataObject = this.tablePaginator.setInputDataObject(output);
   }
 

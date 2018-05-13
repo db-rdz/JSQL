@@ -32,19 +32,16 @@ export default class FilterObject {
         for(let rowIndex = 0, length = rowSet.length, rowObject, rowData; rowIndex < length; rowIndex += 1) {
             rowObject = rowSet[rowIndex];
             rowData = rowObject.rowData;
-            switch (columnIndex) {
-                case (!isNaN(columnIndex)): { // If columnIndex is specified then just filter on that column.
-                    if (this[this.filterFunction](columnIndex, rowData, this.parameters)) {
-                        FilteredDataSet.pushRow(rowData);
-                    }
-                    break;
+            if (!isNaN(columnIndex)) { // If columnIndex is specified then just filter on that column.
+                if (this[this.filterFunction](columnIndex, rowData, this.parameters)) {
+                    FilteredDataSet.pushRow(rowData);
                 }
-                default: { // If no columnIndex is specified look on all columns.
-                    for (let columnNumber = 0, row_length = rowData.length; columnNumber < row_length; columnNumber += 1) {
-                        if (this[this.filterFunction](columnNumber, rowData, this.parameters)) {
-                            FilteredDataSet.pushRow(rowSet[rowIndex].rowData);
-                            break; // If filter already added row to the filtered rows then break off the loop.
-                        }
+            }
+            else { // If no columnIndex is specified look on all columns.
+                for (let columnNumber = 0, row_length = rowData.length; columnNumber < row_length; columnNumber += 1) {
+                    if (this[this.filterFunction](columnNumber, rowData, this.parameters)) {
+                        FilteredDataSet.pushRow(rowSet[rowIndex].rowData);
+                        break; // If filter already added row to the filtered rows then break off the loop.
                     }
                 }
             }
@@ -103,16 +100,16 @@ export default class FilterObject {
 
      // ------------------------ STRING FILTERS ----------------------- //
 
-    startsWith() {
-
+    startsWith(targetColumnIndex, rowData, parameters) {
+        return rowData[targetColumnIndex].startsWith(parameters);
     }
 
-    contains() {
-
+    contains(targetColumnIndex, rowData, parameters) {
+        return rowData[targetColumnIndex].includes(parameters);
     }
 
-    endsWith() {
-
+    endsWith(targetColumnIndex, rowData, parameters) {
+        return rowData[targetColumnIndex].endsWith(parameters);
     }
 
     // ------------------------ UNIVERSAL FILTERS ----------------------- //

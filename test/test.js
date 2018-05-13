@@ -254,11 +254,11 @@ describe('#FilterManager', function() {
         dataGrouper: {
             groupingType: 'Value',
             targetColumn: 'Name',
-            yAxisList: [
+            yAxis: [
                 {
                     dataAction: {
                         actionType: 'addColumn',
-                        targetColumnList: ['Weight Lost'],
+                        targetColumnList: 'Weight Lost',
                         color: ''
                     },
                     label: 'Weight loss per person.',

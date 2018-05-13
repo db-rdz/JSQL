@@ -26,7 +26,7 @@ export default class TableSearch {
         FilteredDataSet.pushRow(rowData);
       }
     }
-    this.outputDataObject = this.FilteredDataSet;
+    this.outputDataObject = FilteredDataSet;
     return FilteredDataSet;
   }
 

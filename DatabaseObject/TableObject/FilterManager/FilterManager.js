@@ -73,10 +73,12 @@ export default class FilterManager {
     on({ filterListIndex, filterTag }) {
         const filter = this.filterList[filterListIndex] || this.taggedFilters[filterTag];
         if (filter) {
-            this.outputDataObject = filter.on(this.outputDataObject || this.inputDataObject);
-            if (filter.status) {
-                filter.activatedFilterIndex = this.activatedFilters.length;
-                this.activatedFilters.push(filter);
+            if (!filter.status) {
+                this.outputDataObject = filter.on(this.outputDataObject || this.inputDataObject);
+                if (filter.status) {
+                    filter.activatedFilterIndex = this.activatedFilters.length;
+                    this.activatedFilters.push(filter);
+                }
             }
         }
         return this.outputDataObject;
@@ -111,15 +113,22 @@ export default class FilterManager {
         const filter = this.activatedFilters[start];
         if (start <= end && filter) {
             this.outputDataObject = filter.on(this.outputDataObject);
-            this.reApplyFiltersInRange(start + 1, end);
+            return this.reApplyFiltersInRange(start + 1, end);
         } else {
             return this.outputDataObject;
         }
-
     }
 
     setInputDataObject(inputDataObject) {
         this.inputDataObject = inputDataObject;
         return this.reApplyAllFilters();
+    }
+
+    getFilterByTag(tag) {
+        const filter = this.taggedFilters[tag]
+        if (filter) {
+            return filter;
+        }
+        return false;
     }
 }

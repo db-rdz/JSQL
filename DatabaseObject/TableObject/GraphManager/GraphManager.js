@@ -17,10 +17,21 @@ export default class GraphManager {
     }
 
     createGraph(graphArgs) {
-        let {options, filterManager, graphType, dataGrouper} =  graphArgs;
+        let { options, filterManager, graphType, dataGrouper } =  graphArgs || {};
         const createdGraph = new GraphObject({ dataObject: this.dataObject, options, filterManager, graphType, dataGrouper })
         this.graphList.push(createdGraph);
         return this.graphList.length - 1; // Returns graph's index
+    }
+
+    updateGraph(graphIndex, graphArgs) {
+        let {options, filterManager, graphType, dataGrouper} =  graphArgs;
+        this.graphList[graphIndex] = new GraphObject({ dataObject: this.dataObject, options, filterManager, graphType, dataGrouper });
+    }
+
+    deleteGraph(graphIndex) {
+        if (graphIndex >= 0) {
+            this.graphList.splice(graphIndex , 1);
+        }
     }
 
     getGraph(graphIndex) {

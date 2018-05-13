@@ -15,14 +15,24 @@ export default class TableSearcher {
     const columnList = this.inputDataObject.columnArray.columnList;
     const columns = Object.keys(columnList);
     for (let i = 0, length = columns.length; i < length; i += 1) {
-      this.columnSearchManager.createFilter({ targetColumn: columns[i], filterFunction: 'contains', parameters: '', status: false, tag: columns[i] });
+      if (!this.columnSearchManager.getFilterByTag(columns[i])) {
+        this.columnSearchManager.createFilter({ targetColumn: columns[i], filterFunction: 'contains', parameters: '', status: false, tag: columns[i] });
+      }
     }
   }
 
-  doColumnSearch(columnTarget, searchString) {
-    this.columnSearchManager.taggedFilters[columnTarget].parameters = searchString; // This has to change in the future to a "editFilter" function in the FilterManager.
-    this.outputDataObject = this.columnSearchManager.on({ filterTag: columnTarget });
-    return outputDataObject;
+  doColumnSearch(targetColumn, searchString) {
+    const filter = this.columnSearchManager.getFilterByTag(targetColumn);
+    if (filter) {
+      filter.parameters = searchString;
+      if (filter.status) {
+        this.columnSearchManager.off({ filterTag: targetColumn });
+      }
+      this.columnSearchManager.on({ filterTag: targetColumn });
+    }
+    this.columnSearchManager.taggedFilters[targetColumn].parameters = searchString; // This has to change in the future to a "editFilter" function in the FilterManager.
+    this.outputDataObject = this.columnSearchManager.on({ filterTag: targetColumn });
+    return this.outputDataObject;
   }
 
   doTableSearch(searchString) {
@@ -37,6 +47,7 @@ export default class TableSearcher {
   setInputDataObject(inputDataObject) {
     // Set input data object.
     this.inputDataObject = inputDataObject;
+    this.createColumnSearchObjects();
     let output = this.tableSearch.setInputDataObject(this.inputDataObject);
     output = this.columnSearchManager.setInputDataObject(output);
     this.outputDataObject = output;
