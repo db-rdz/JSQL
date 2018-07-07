@@ -5,10 +5,21 @@ import TablePaginator from './TablePaginator/TablePaginator';
 import GraphManager from './GraphManager/GraphManager';
 
 export default class TableObject {
-  constructor({ name = "", dataObject = {}, filterManager = {}, graphManager = {} }) {
+  constructor({ name = "", dataObject = {}, filterManager = {}, graphManager = {}, options = { }, }) {
+    this.options = {};
+    this.options.allowCellEditing = options.allowCellEditing !== undefined ? options.allowCellEditing : true;
+    this.options.allowCellAdding = options.allowCellAdding !== undefined ? options.allowCellAdding : true;
+    this.options.allowColumnAdding = options.allowColumnAdding !== undefined ? options.allowColumnAdding : true;
+    this.options.allowColumnRemoving = options.allowColumnRemoving !== undefined ? options.allowColumnRemoving : true;
+    this.options.allowRowAdding = options.allowRowAdding !== undefined ? options.allowRowAdding : true;
+    this.options.allowRowRemoving = options.allowRowRemoving !== undefined ? options.allowRowRemoving : true;
+    this.options.allowTableSearching = options.allowTableSearching !== undefined ? options.allowTableSearching : true;
+    this.options.allowColumnSearching = options.allowColumnSearching !== undefined ? options.allowColumnSearching : true;
+    this.options.allowFilterCreation = options.allowFilterCreation !== undefined ? options.allowFilterCreation : true;
+    this.options.allowFilterDeletion = options.allowFilterCreation !== undefined ? options.allowFilterCreation : true;
+    this.options.allowFiltering = options.allowFilterCreation !== undefined ? options.allowFilterCreation : true;
 
     if (!name) {
-      throw new console.error("Table must have a name");
     }
 
     let { filterList, taggedFilters, activatedFilters } = filterManager;
@@ -81,44 +92,68 @@ export default class TableObject {
   // -------------------------- CELL MODIFIERS ------------------------- //
   editCell(rowIndex, columnName, value) {
     // columnIndex = this.getColumnIndex(columnName);
+    if (this.options && !this.options.allowCellEditing) {
+      return;
+    }
     this.dataObject.editCell(rowIndex, columnName, value);
   }
 
   // --------------------------------------- ADDING FUNCITONS ---------------------------------------- //
 
   pushColumn(name, type) {
+    if (this.options && !this.options.allowColumnAdding && !this.options.allowCellAdding) {
+      return;
+    }
     this.dataObject.pushColumn(name, type);
     this.pushCellInAllRows("EMPTY");
     this.processInputDataObject();
   }
 
   addColumn(name, type, position) {
+    if (this.options && !this.options.allowColumnAdding && !this.options.allowCellAdding) {
+      return;
+    }
     this.dataObject.addColumn(name, type, position);
     this.addCellInAllRows(position, "EMPTY");
     this.processInputDataObject();
   }
 
   pushRow(data = []) {
+    if (this.options && !this.options.allowRowAdding && !this.options.allowCellAdding) {
+      return;
+    }
     const sanitizedData = this.sanitizeRowData(data);
     this.dataObject.pushRow(sanitizedData);
     this.processInputDataObject();
   }
 
   addRow(data, position) {
+    if (this.options && !this.options.allowRowAdding && !this.options.allowCellAdding) {
+      return;
+    }
     const sanitizedData = this.sanitizeRowData(data);
     this.dataObject.addRow(sanitizedData, position);
     this.processInputDataObject();
   }
 
   addCell(rowPosition, cellPosition, cellValue) {
+    if (this.options && !this.options.allowCellAdding) {
+      return;
+    }
     this.dataObject.addCell(rowPosition, cellPosition, cellValue)
   }
 
   pushCell(rowPosition, cellValue) {
+    if (this.options && !this.options.allowCellAdding) {
+      return;
+    }
     this.dataObject.pushCell(rowPosition, cellValue);
   }
 
   addCellInAllRows(cellPosition, cellValue) {
+    if (this.options && !this.options.allowCellAdding) {
+      return;
+    }
     const rowCount = this.getNumberofRows;
     for (let i = 0; i < rowCount; i += 1) {
       this.addCell(i, cellPosition, cellValue);
@@ -135,6 +170,9 @@ export default class TableObject {
   // --------------------------------------- REMOVING FUNCTIONS ------------------------------------------------- //
 
   removeRow(position) {
+    if (this.options && !this.options.allowRowRemoving) {
+      return;
+    }
     this.dataObject.removeRow(position);
     this.processInputDataObject();
   }
@@ -143,6 +181,9 @@ export default class TableObject {
 
   // --------------------------------------- TABLE SEARCHER ACTIONS -------------------------------- //
   searchTable(searchString) {
+    if (this.options && !this.options.allowTableSearching) {
+      return;
+    }
     const output =  this.tableSearcher.doTableSearch(searchString);
     this.processedDataObject = this.tablePaginator.setInputDataObject(output);
   }
@@ -153,6 +194,9 @@ export default class TableObject {
    * @param {*} searchString 
    */
   searchColumn(targetColumn, searchString) {
+    if (this.options && !this.options.allowColumnSearching) {
+      return;
+    }
     const output =  this.tableSearcher.doColumnSearch(targetColumn, searchString);
     this.processedDataObject = this.tablePaginator.setInputDataObject(output);
   }
@@ -160,10 +204,16 @@ export default class TableObject {
   // --------------------------------------- FILTER MANAGER ACTIONS -------------------------------- //
 
   createFilter(filterOptions) {
+    if (this.options && !this.options.allowFilterCreation) {
+      return;
+    }
     this.filterManager.createFilter(filterOptions);
   }
 
   deleteFilter(filterListIndex) {
+    if (this.options && !this.options.allowFilterDeletion) {
+      return;
+    }
     let output = this.filterManager.deleteFilter(filterListIndex);
     output = this.tableSearcher.setInputDataObject(output);
     output = this.tablePaginator.setInputDataObject(output);
@@ -172,6 +222,9 @@ export default class TableObject {
   }
 
   activateFilter({ filterListIndex, filterTag }) {
+    if (this.options && !this.options.allowFiltering) {
+      return;
+    }
     let output = this.filterManager.on({ filterListIndex, filterTag });
     output = this.tableSearcher.setInputDataObject(output);
     output = this.tablePaginator.setInputDataObject(output);
@@ -180,6 +233,9 @@ export default class TableObject {
   }
 
   deactivateFilter({ filterListIndex, filterTag }) {
+    if (this.options && !this.options.allowFiltering) {
+      return;
+    }
     let output = this.filterManager.off({ filterListIndex, filterTag });
     output = this.tableSearcher.setInputDataObject(output);
     output = this.tablePaginator.setInputDataObject(output);

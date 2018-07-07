@@ -1,8 +1,8 @@
 {
   "name": "jsql-smarttable",
-  "version": "1.1.25",
+  "version": "1.1.27",
   "description": "Manage table-like data in front-end",
-  "main": "./DatabaseObject/DatabaseObject",
+  "main": "./JSQL",
   "scripts": {
     "test": "mocha --require babel-polyfill --require babel-register"
   },

@@ -1,7 +1,7 @@
 import FilterObject from './FilterObject/FilterObject';
 
 export default class FilterManager {
-    constructor({ inputDataObject, filterList = [], taggedFilters = [], activatedFilters = [] }) {
+    constructor({ inputDataObject, filterList = [], taggedFilters = {}, activatedFilters = [] }) {
         this.activatedFilters = this.importFilters(activatedFilters);
         this.taggedFilters = this.importTaggedFilters(taggedFilters);
         this.filterList = this.importFilters(filterList);
