@@ -22,6 +22,7 @@ import { TableObject } from 'jsql-smarttable';
 The constructor of the TableObject class takes as a parameter a single Object. You can pass the desired table information or options within this object.
 The following example shows all the keys that can be included in the constructor object:
 
+```
 Const clientsTable  = new TableObject({
   name: 'Clients',
   columns: [],
@@ -41,8 +42,11 @@ Const clientsTable  = new TableObject({
     allowFiltering: true,
   },
 });
+```
 
 ## API
+
+API docs coming soon...
 
 ## Examples
 
