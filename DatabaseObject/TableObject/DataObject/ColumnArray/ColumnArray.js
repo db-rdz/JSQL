@@ -26,6 +26,18 @@ export default class ColumnArray {
     return false;
   }
 
+  getColumnIndex(columnName) {
+    return this.columnList[columnName].getColumnIndex();
+  }
+
+  getMultipleColumnIndex(columnNameList) {
+    const results = [];
+    for (let i = 0, length = columnNameList.length; i < length; i += 1) {
+      results.push(this.getColumnIndex(columnNameList[i]));
+    }
+    return results;
+  }
+
   addColumn(name, type, index) {
     this.columnList[name] = new ColumnObject({ name, type, index });
     this.numberofColumns = this.getNumberofColumns();
@@ -38,6 +50,13 @@ export default class ColumnArray {
 
   removeColumn(name) {
     delete this.columnList[name];
+  }
+
+  removeMultipleColumns(columnNameList) {
+    while(columnNameList.length) {
+      let columnName = columnNameList.shift();
+      delete this.columnList[columnName];
+    }
   }
 
   getNumberofColumns() {

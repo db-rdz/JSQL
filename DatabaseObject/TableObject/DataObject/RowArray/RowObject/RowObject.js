@@ -9,7 +9,8 @@ export default class RowObject {
   }
 
   editCell(columnIndex, value) {
-    this.rowData[columnIndex] = value;
+    // this.rowData[columnIndex] = value;
+    this.rowData.splice(columnIndex, 1, value);
   }
 
   addCell(position, data = "") {

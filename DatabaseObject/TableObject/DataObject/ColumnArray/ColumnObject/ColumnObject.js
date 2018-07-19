@@ -14,8 +14,16 @@ export default class ColumnObject extends ValidatableObject {
 
     super({ type });
     this.name = name;
-    this.type = type;
     this.index = index;
+  }
+
+  editColumnName(name) {
+    this.name = name;
+  }
+
+  editColumnType(type) {
+    this.type = type;
+    // TODO: Add validation step to validate column values.
   }
 
   getColumnIndex() {

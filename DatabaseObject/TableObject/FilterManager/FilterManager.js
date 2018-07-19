@@ -1,21 +1,24 @@
 import FilterObject from './FilterObject/FilterObject';
 
 export default class FilterManager {
-    constructor({ inputDataObject, filterList = [], taggedFilters = {}, activatedFilters = [] }) {
-        this.activatedFilters = this.importFilters(activatedFilters);
-        this.taggedFilters = this.importTaggedFilters(taggedFilters);
-        this.filterList = this.importFilters(filterList);
+    constructor({ inputDataObject, filters = [] }) {
+        this.activatedFilters = [];
+        this.taggedFilters = [];
+        this.filterList = [];
 
         this.inputDataObject = inputDataObject;
         this.outputDataObject = inputDataObject;
+
+        this.importFilters(filters);
     }
 
-    importFilters(filterArray) {
-        let filters =  [];
+    importFilters(filters) {
+        // let filters =  [];
         for(let i = 0, length = filterArray.length; i < length; i += 1) {
-            filters.push(new FilterObject(filterArray[i]));
+            // filters.push(new FilterObject(filterArray[i]));
+            this.createFilter(filters[i]);
         }
-        return filters;
+        // return filters;
     }
 
     importTaggedFilters(taggedFilters) {

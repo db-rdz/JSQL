@@ -5,7 +5,7 @@ import TablePaginator from './TablePaginator/TablePaginator';
 import GraphManager from './GraphManager/GraphManager';
 
 export default class TableObject {
-  constructor({ name = "", dataObject = {}, filterManager = {}, graphManager = {}, options = { }, }) {
+  constructor({ name = "", rows = [], columns = [], filters = {}, graphManager = {}, options = { }, }) {
     this.options = {};
     this.options.allowCellEditing = options.allowCellEditing !== undefined ? options.allowCellEditing : true;
     this.options.allowCellAdding = options.allowCellAdding !== undefined ? options.allowCellAdding : true;
@@ -22,11 +22,9 @@ export default class TableObject {
     if (!name) {
     }
 
-    let { filterList, taggedFilters, activatedFilters } = filterManager;
-
     this.name = name;
-    this.dataObject = new DataObject(dataObject);
-    this.filterManager = new FilterManager({ inputDataObject: this.dataObject, filterList, taggedFilters, activatedFilters });
+    this.dataObject = new DataObject({ rows, columns });
+    this.filterManager = new FilterManager({ inputDataObject: this.dataObject, filters });
     this.tableSearcher = new TableSearcher({ inputDataObject: this.filterManager.outputDataObject });
     this.tablePaginator = new TablePaginator({ inputDataObject: this.tableSearcher.outputDataObject, pageSize: 10, navigationBarSize: 10 }); 
     
@@ -96,6 +94,10 @@ export default class TableObject {
       return;
     }
     this.dataObject.editCell(rowIndex, columnName, value);
+  }
+
+  editTableName(name) {
+    this.name = name;
   }
 
   // --------------------------------------- ADDING FUNCITONS ---------------------------------------- //
@@ -174,6 +176,55 @@ export default class TableObject {
       return;
     }
     this.dataObject.removeRow(position);
+    this.processInputDataObject();
+  }
+
+  removeMultipleRows(rowList) {
+    if (this.options && !this.options.allowRowRemoving) {
+      return;
+    }
+    this.dataObject.removeMultipleRows(rowList);
+    this.processInputDataObject();
+  }
+
+  removeCell(rowPosition, cellPosition) {
+    if (this.options && !this.options.allowColumnRemoving) {
+      return;
+    }
+    this.dataObject.removeCell(rowPosition, cellPosition);
+  }
+
+  removeCellInAllRows(cellPosition) {
+    if (this.options && !this.options.allowColumnRemoving) {
+      return;
+    }
+    this.dataObject.removeCellInAllRows(cellPosition);
+    // We don't process the dataobject here since this function is only supposed to be used
+    // internally by the TableObject class.
+  }
+
+  removeColumn(columnName) {
+    if (this.options && !this.options.allowColumnRemoving) {
+      return;
+    }
+
+    const columnIndex = this.dataObject.getColumnIndex(columnName);
+    this.dataObject.removeColumn(columnName);
+    this.removeCellInAllRows(columnIndex);
+    this.processInputDataObject();
+  }
+
+  removeMultipleColumns(columnNameList) {
+    if (this.options && !this.options.allowColumnRemoving) {
+      return;
+    }
+
+    // We need the indexes to delete the cells from the rows.
+    const columnIndexList = this.dataObject.getMultipleColumnIndex(columnNameList);
+    // We use the names to delete the columns.
+    this.dataObject.removeMultipleColumns(columnNameList);
+    this.dataObject.removeMultipleCellsInAllRows(columnIndexList);
+
     this.processInputDataObject();
   }
 

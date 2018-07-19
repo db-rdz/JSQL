@@ -2,15 +2,19 @@ import ColumnArray from './ColumnArray/ColumnArray';
 import RowArray from './RowArray/RowArray';
 
 export default class DataObject {
-  constructor({ columnList = [], rowList = [] }) {
-    this.columnArray = new ColumnArray({ columnList });
-    this.rowArray = new RowArray({ rowList });
+  constructor({ columns = [], rows = [] }) {
+    this.columnArray = new ColumnArray({ columns });
+    this.rowArray = new RowArray({ rows });
   }
 
   // -------------------------- GETTERS ---------------------------- //
 
   getColumnIndex(columnName) {
-    return this.columnArray.getColumn(columnName).getColumnIndex();
+    return this.columnArray.getColumnIndex(columnName);
+  }
+
+  getMultipleColumnIndex(columnNameList) {
+    return this.columnArray.getMultipleColumnIndex(columnNameList);
   }
 
   getNumberofColumns() {
@@ -45,7 +49,31 @@ export default class DataObject {
   }
 
   removeRow(position) {
-    this.rowArray.deleteRow(position);
+    this.rowArray.removeRow(position);
+  }
+
+  removeMultipleRows(rowList) {
+    this.rowArray.removeMultipleRows(rowList);
+  }
+
+  removeCell(rowPosition, cellPosition) {
+    this.rowArray.removeCell(rowPosition, cellPosition);
+  }
+
+  removeCellInAllRows(cellPosition) {
+    this.rowArray.removeCellInAllRows(cellPosition);
+  }
+
+  removeMultipleCellsInAllRows(cellPositionList) {
+    this.rowArray.removeMultipleCellsInAllRows(cellPositionList);
+  }
+
+  removeColumn(columnName) {
+    this.columnArray.removeRow(columnName);
+  }
+
+  removeMultipleColumns(columnNameList) {
+    this.columnArray.removeMultipleColumns(columnNameList);
   }
 
   editCell(rowIndex, columnName, value) {
