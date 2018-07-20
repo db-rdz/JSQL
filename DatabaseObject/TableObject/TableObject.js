@@ -7,6 +7,9 @@ import GraphManager from './GraphManager/GraphManager';
 export default class TableObject {
   constructor({ name = "", rows = [], columns = [], filters = {}, graphManager = {}, options = { }, }) {
     this.options = {};
+
+    // Table Object Options
+    this.options.allowTableNameEditing = options.allowTableNameEditing !== undefined ? options.allowTableNameEditing : false,
     this.options.allowCellEditing = options.allowCellEditing !== undefined ? options.allowCellEditing : true;
     this.options.allowCellAdding = options.allowCellAdding !== undefined ? options.allowCellAdding : true;
     this.options.allowColumnAdding = options.allowColumnAdding !== undefined ? options.allowColumnAdding : true;
@@ -33,91 +36,17 @@ export default class TableObject {
     this.processedDataObject = this.tablePaginator.getCurrentPageData();
   }
 
-  // ------------------------------- GETTERS ------------------------ //
-
-  /**
-   * Returns the unfiltered data of the table.
-   */
-  getOriginalData() {
-    return this.dataObject;
-  }
-
-  /**
-   * Return the filtered data if there is at least one filter on.
-   * 
-   */
-
-  getCurrentData() {
-    if (this.filterManager.activatedFilters.length) {
-      return this.filterManager.outputDataObject;
+  // ------------------------------- TABLE OBJECT FUNCTIONS ---------------------- //
+  editTableName(name) {
+    if (this.options && this.options.allowTableNameEditing) {
+      this.name = name;
     }
-    return this.dataObject;
   }
 
-  getNumberofColumns() {
-    return this.dataObject.getNumberofColumns();
-  }
+  // ------------------------------- ROW FUNCTIONS ------------------------ //
 
   getNumberofRows() {
     return this.dataObject.getNumberofRows();
-  }
-
-  getColumnIndex(columnName) {
-    return this.dataObject.getColumnIndex(columnName);
-  }
-
-  // -------------------------- HELPERS -------------------------------- //
-  sanitizeRowData(data) {
-    const tableColumnCount = this.getNumberofColumns();
-    const dataColumnCount = data.length;
-
-    if (dataColumnCount === 0) {
-      let offset = tableColumnCount;
-      while(offset--) {
-        data.push("EMPTY CELL");
-      }
-    } else if (tableColumnCount > dataColumnCount) {
-      let offset = tableColumnCount - dataColumnCount;
-      while (offset--) {
-        data.push("EMPTY CELL");
-      }
-    } else if (dataColumnCount > tableColumnCount) {
-      // Throw error
-    }
-    return data;
-  }
-
-  // -------------------------- CELL MODIFIERS ------------------------- //
-  editCell(rowIndex, columnName, value) {
-    // columnIndex = this.getColumnIndex(columnName);
-    if (this.options && !this.options.allowCellEditing) {
-      return;
-    }
-    this.dataObject.editCell(rowIndex, columnName, value);
-  }
-
-  editTableName(name) {
-    this.name = name;
-  }
-
-  // --------------------------------------- ADDING FUNCITONS ---------------------------------------- //
-
-  pushColumn(name, type) {
-    if (this.options && !this.options.allowColumnAdding && !this.options.allowCellAdding) {
-      return;
-    }
-    this.dataObject.pushColumn(name, type);
-    this.pushCellInAllRows("EMPTY");
-    this.processInputDataObject();
-  }
-
-  addColumn(name, type, position) {
-    if (this.options && !this.options.allowColumnAdding && !this.options.allowCellAdding) {
-      return;
-    }
-    this.dataObject.addColumn(name, type, position);
-    this.addCellInAllRows(position, "EMPTY");
-    this.processInputDataObject();
   }
 
   pushRow(data = []) {
@@ -137,6 +66,78 @@ export default class TableObject {
     this.dataObject.addRow(sanitizedData, position);
     this.processInputDataObject();
   }
+
+  removeRow(position) {
+    if (this.options && !this.options.allowRowRemoving) {
+      return;
+    }
+    this.dataObject.removeRow(position);
+    this.processInputDataObject();
+  }
+
+  removeMultipleRows(rowList) {
+    if (this.options && !this.options.allowRowRemoving) {
+      return;
+    }
+    this.dataObject.removeMultipleRows(rowList);
+    this.processInputDataObject();
+  }
+
+  // ----------------------------- COLUMN FUNCTIONS ----------------------------- //
+
+  getNumberofColumns() {
+    return this.dataObject.getNumberofColumns();
+  }
+
+  getColumnIndex(columnName) {
+    return this.dataObject.getColumnIndex(columnName);
+  }
+
+  pushColumn(name, type) {
+    if (this.options && !this.options.allowColumnAdding && !this.options.allowCellAdding) {
+      return;
+    }
+    this.dataObject.pushColumn(name, type);
+    this.pushCellInAllRows("EMPTY");
+    this.processInputDataObject();
+  }
+
+  addColumn(name, type, position) {
+    if (this.options && !this.options.allowColumnAdding && !this.options.allowCellAdding) {
+      return;
+    }
+    this.dataObject.addColumn(name, type, position);
+    this.addCellInAllRows(position, "EMPTY");
+    this.processInputDataObject();
+  }
+
+
+  removeColumn(columnName) {
+    if (this.options && !this.options.allowColumnRemoving) {
+      return;
+    }
+
+    const columnIndex = this.dataObject.getColumnIndex(columnName);
+    this.dataObject.removeColumn(columnName);
+    this.removeCellInAllRows(columnIndex);
+    this.processInputDataObject();
+  }
+
+  removeMultipleColumns(columnNameList) {
+    if (this.options && !this.options.allowColumnRemoving) {
+      return;
+    }
+
+    // We need the indexes to delete the cells from the rows.
+    const columnIndexList = this.dataObject.getMultipleColumnIndex(columnNameList);
+    // We use the names to delete the columns.
+    this.dataObject.removeMultipleColumns(columnNameList);
+    this.dataObject.removeMultipleCellsInAllRows(columnIndexList);
+
+    this.processInputDataObject();
+  }
+
+  // --------------------------------------- CELL FUNCITONS ---------------------------------------- //
 
   addCell(rowPosition, cellPosition, cellValue) {
     if (this.options && !this.options.allowCellAdding) {
@@ -169,22 +170,11 @@ export default class TableObject {
     }
   }
 
-  // --------------------------------------- REMOVING FUNCTIONS ------------------------------------------------- //
-
-  removeRow(position) {
-    if (this.options && !this.options.allowRowRemoving) {
-      return;
+  editCell(rowIndex, columnName, value) {
+    // columnIndex = this.getColumnIndex(columnName);
+    if (this.options && this.options.allowCellEditing) {
+      this.dataObject.editCell(rowIndex, columnName, value);
     }
-    this.dataObject.removeRow(position);
-    this.processInputDataObject();
-  }
-
-  removeMultipleRows(rowList) {
-    if (this.options && !this.options.allowRowRemoving) {
-      return;
-    }
-    this.dataObject.removeMultipleRows(rowList);
-    this.processInputDataObject();
   }
 
   removeCell(rowPosition, cellPosition) {
@@ -203,33 +193,6 @@ export default class TableObject {
     // internally by the TableObject class.
   }
 
-  removeColumn(columnName) {
-    if (this.options && !this.options.allowColumnRemoving) {
-      return;
-    }
-
-    const columnIndex = this.dataObject.getColumnIndex(columnName);
-    this.dataObject.removeColumn(columnName);
-    this.removeCellInAllRows(columnIndex);
-    this.processInputDataObject();
-  }
-
-  removeMultipleColumns(columnNameList) {
-    if (this.options && !this.options.allowColumnRemoving) {
-      return;
-    }
-
-    // We need the indexes to delete the cells from the rows.
-    const columnIndexList = this.dataObject.getMultipleColumnIndex(columnNameList);
-    // We use the names to delete the columns.
-    this.dataObject.removeMultipleColumns(columnNameList);
-    this.dataObject.removeMultipleCellsInAllRows(columnIndexList);
-
-    this.processInputDataObject();
-  }
-
-
-
   // --------------------------------------- TABLE SEARCHER ACTIONS -------------------------------- //
   searchTable(searchString) {
     if (this.options && !this.options.allowTableSearching) {
@@ -239,11 +202,6 @@ export default class TableObject {
     this.processedDataObject = this.tablePaginator.setInputDataObject(output);
   }
 
-  /**
-   * 
-   * @param {*} targetColumn: The name of the column to search in.
-   * @param {*} searchString 
-   */
   searchColumn(targetColumn, searchString) {
     if (this.options && !this.options.allowColumnSearching) {
       return;
@@ -301,5 +259,39 @@ export default class TableObject {
     output = this.tablePaginator.setInputDataObject(output);
 
     this.processedDataObject = output;
+  }
+
+    // ----------------------------------- HELPERS -------------------------------- //
+
+
+  getOriginalData() {
+    return this.dataObject;
+  }
+
+  getCurrentData() {
+    if (this.filterManager.activatedFilters.length) {
+      return this.filterManager.outputDataObject;
+    }
+    return this.dataObject;
+  }
+  
+  sanitizeRowData(data) {
+    const tableColumnCount = this.getNumberofColumns();
+    const dataColumnCount = data.length;
+
+    if (dataColumnCount === 0) {
+      let offset = tableColumnCount;
+      while(offset--) {
+        data.push("EMPTY CELL");
+      }
+    } else if (tableColumnCount > dataColumnCount) {
+      let offset = tableColumnCount - dataColumnCount;
+      while (offset--) {
+        data.push("EMPTY CELL");
+      }
+    } else if (dataColumnCount > tableColumnCount) {
+      // Throw error
+    }
+    return data;
   }
 }
